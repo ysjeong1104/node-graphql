@@ -1,17 +1,41 @@
-import {graphql, buildSchema} from "graphql";
+import { ApolloServer,gql } from "apollo-server";
+ 
 
-const schema = buildSchema(`
-    type Query {
-            hello: String
+const typeDefs = gql`
+type User {
+    id: ID!
+    username: String!
+    firstname: String!
+    lastname: String!
+}
+type Tweet {
+    id:ID!
+    text:String!
+    author: User!
+}
+type Query {
+  allTwees: [Tweet!]!
+  tweet(id: ID):Tweet
+}
+type Mutation {
+    postTweet(text:String!,userId: ID!): Tweet!
+    deleteTweet(id:ID!): Boolean!
+}
+`;
+
+const resolvers={
+    Query : {
+        tweet : ()=>{
+            console.log("im called");
+            return null;
         }
-    `);
+    }
+}
 
-const root = { hello:()=>"hello World"};
 
-const result = JSON.parse(JSON.stringify(await graphql({
-    schema : schema,
-    source : "{ hello }",
-    rootValue : root
-})));
+const server  = new ApolloServer({typeDefs,resolvers});
 
-console.log(result);
+
+server.listen().then(({url})=>{
+    console.log(`Running on ${url}`);
+})
