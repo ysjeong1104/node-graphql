@@ -1,0 +1,7 @@
+node_modules
+build
+npm-debug.log
+packge-lock.json
+.nyc
+.env
+.DS_Store
