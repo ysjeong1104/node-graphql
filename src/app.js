@@ -14,11 +14,13 @@ const users=[{
 let tweets=[
     {
         id:"1",
-        text:"first one"        
+        text:"first one",
+        userId:"1" 
     },
     {
         id:"2",
-        text:"second one"
+        text:"second one",
+        userId:"2"
     }
 
 ]
@@ -29,8 +31,14 @@ type User {
     username: String!
     firstName: String!
     lastName: String!
+    """
+    Is the sum of firstName + lastName
+    """
     fullName: String!
 }
+"""
+Tweet object represents a resource for a tweet
+"""
 type Tweet {
     id:ID!
     text:String!
@@ -78,10 +86,15 @@ const resolvers={
         },
     },
     User:{
-        fullName:({firstName,lastName})=>{
-            console.log("fullName Called");
-            //console.log(root);
-            return firstName+' '+lastName;
+        fullName : ({firstName,lastName})=>{
+            return `${firstName} ${lastName}`;
+        }
+    },
+    Tweet:{
+        author:({userId}/* root */)=>{
+            
+            const tmpUser = users.find(user=>user.id === userId)
+            return tmpUser;
         }
     }
 }
