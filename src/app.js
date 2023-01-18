@@ -1,5 +1,6 @@
 import { ApolloServer,gql } from "apollo-server";
- 
+import fetch from "node-fetch";
+
 const users=[{
         id:"1",
         firstName:"정",
@@ -44,10 +45,35 @@ type Tweet {
     text:String!
     author: User
 }
+type Movie {
+    id: Int!
+    url: String!
+    imdb_code: String!
+    title: String!
+    title_english: String!
+    title_long: String!
+    slug: String!
+    year: Int!
+    rating: Float!
+    runtime: Float!
+    genres: [String]!
+    summary: String
+    description_full: String!
+    synopsis: String
+    yt_trailer_code: String!
+    language: String!
+    background_image: String!
+    background_image_original: String!
+    small_cover_image: String!
+    medium_cover_image: String!
+    large_cover_image: String!
+}
 type Query {
   allTweets: [Tweet!]!
   tweet(id: ID):Tweet
   allUsers: [User!]!
+  allMovies: [Movie!]!
+  movie(id: ID): Movie!
 }
 type Mutation {
     postTweet(text:String!,userId: ID!): Tweet!
@@ -65,6 +91,22 @@ const resolvers={
         },
         allUsers: ()=>{
             return users;
+        },
+        allMovies: async ()=>{
+            const movies = await (await fetch("https://yts.mx/api/v2/list_movies.json",{
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })).json();
+            return movies.data.movies;
+        },
+        movie : async (_,{id})=>{
+            const movies = await (await fetch(`https://yts.mx/api/v2/movie_details.json?movie_id=${id}`,{
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })).json();
+            return movies.data.movie;
         }
     },
     Mutation : {
